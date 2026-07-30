@@ -1,0 +1,31 @@
+name: ci
+
+# Cheap structural checks. A tap's real test is `brew install`, which needs a
+# macOS runner and downloads a toolchain — too heavy to run per push, so it
+# stays a manual `brew install --verbose --debug` before publishing changes.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Formula parses as Ruby
+        run: ruby -c Formula/*.rb
+
+      - name: Shell scripts lint clean
+        run: shellcheck scripts/*.sh
+
+      - name: Aliases resolve to a real formula
+        run: |
+          set -eu
+          for a in Aliases/*; do
+            target=$(readlink "$a") || { echo "error: $a is not a symlink"; exit 1; }
+            [ -f "Aliases/$target" ] || { echo "error: $a -> $target is dangling"; exit 1; }
+            echo ":: $a -> $target"
+          done

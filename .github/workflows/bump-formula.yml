@@ -1,0 +1,68 @@
+name: bump-formula
+
+# Keep Formula/mcpp-m.rb pointed at the newest mcpp release.
+#
+# Three ways in, deliberately:
+#   repository_dispatch — upstream's release pipeline pings us the moment a
+#                         release finishes (needs a PAT on the upstream side).
+#   schedule            — daily catch-up, so the tap self-heals even with no
+#                         token configured upstream. This is the safety net,
+#                         not the primary path.
+#   workflow_dispatch   — manual pin / re-run.
+#
+# All three converge on scripts/update-formula.sh, which reads the sha256
+# sidecars upstream publishes and refuses to write a half-rewritten formula.
+
+on:
+  repository_dispatch:
+    types: [mcpp-release]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "mcpp version to pin (blank = upstream latest)"
+        required: false
+  schedule:
+    - cron: "23 4 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bump-formula
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve target version
+        id: ver
+        run: |
+          # Empty on the schedule trigger — update-formula.sh then resolves
+          # upstream's latest release itself.
+          V="${{ github.event.client_payload.version }}"
+          [ -n "$V" ] || V="${{ github.event.inputs.version }}"
+          echo "version=${V}" >> "$GITHUB_OUTPUT"
+          echo ":: requested version: ${V:-<latest>}"
+
+      - name: Update the formula
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/update-formula.sh ${{ steps.ver.outputs.version }}
+
+      - name: Commit and push
+        run: |
+          set -eu
+          if git diff --quiet -- Formula; then
+            echo ":: formula already current — nothing to commit"
+            exit 0
+          fi
+          VER=$(sed -nE 's/^[[:space:]]*version "([^"]+)".*/\1/p' Formula/mcpp-m.rb | head -1)
+          git config user.name  "mcpp-ci"
+          git config user.email "x.d2learn.org@gmail.com"
+          git commit -qam "mcpp ${VER}"
+          git push
+          echo ":: pushed mcpp ${VER}"
+          echo "Bumped the formula to **${VER}**." >> "$GITHUB_STEP_SUMMARY"
