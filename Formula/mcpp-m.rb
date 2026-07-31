@@ -60,6 +60,11 @@ class McppM < Formula
     # dir — `brew upgrade` would then silently drop every installed toolchain.
     # Pin the two env knobs the binary honors, deferring to values the user
     # already exported. Mirrors the Arch launcher (upstream scripts/aur).
+    #
+    # bin.mkpath first: nothing has created <prefix>/bin at this point (the
+    # payload went to libexec), and Homebrew's Pathname#write does not make
+    # parent directories — write_env_script mkpaths by hand for this reason.
+    bin.mkpath
     (bin/"mcpp").write <<~SH
       #!/bin/sh
       export MCPP_HOME="${MCPP_HOME:-$HOME/.mcpp}"
