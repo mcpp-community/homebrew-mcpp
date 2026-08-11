@@ -8,15 +8,39 @@ brew install mcpp-community/mcpp/mcpp-m
 ```
 
 That single command taps this repository and installs mcpp; no separate
-`brew tap` step is needed. After the tap exists, the short forms work too:
+`brew tap` step is needed.
+
+## Homebrew 6: trust the tap once
+
+Homebrew 6 refuses to load a formula from an untrusted third-party tap. The
+fully-qualified command above is exempt — Homebrew reads it as explicit intent
+— but every **other** spelling is refused until you trust the tap:
+
+```
+Refusing to load formula mcpp-community/mcpp/mcpp-m from untrusted tap
+mcpp-community/mcpp.
+```
+
+```sh
+brew trust mcpp-community/mcpp
+```
+
+After that, the short forms and upgrades work:
 
 ```sh
 brew install mcpp-m        # the formula
 brew install mcpp-bin      # alias
+brew upgrade mcpp-m
 mcpp --version             # the command is always `mcpp`
 ```
 
-Upgrades and removal are the usual `brew upgrade mcpp-m` / `brew uninstall mcpp-m`.
+Measured on macOS 14.8.7 / 15.7.7 / 26.5.2 with Homebrew 6.0.5 / 6.0.12 /
+6.0.13: the fully-qualified install returns 0 on all three, `brew install
+mcpp-m` and `brew install mcpp-community/mcpp/mcpp` return 1 until
+`brew trust`, and 0 after. Upstream CI asserts the gate from both sides
+(`ci-fresh-install.yml`, job `macos-brew-fresh`).
+
+Removal is the usual `brew uninstall mcpp-m`.
 
 ## Why `mcpp-m` and not `mcpp`
 
@@ -28,8 +52,10 @@ the AUR rather than `mcpp`.
 
 `Aliases/` maps both `mcpp` and `mcpp-bin` to this formula, so
 `brew install mcpp-community/mcpp/mcpp` also resolves here once the tap is
-installed. Plain `brew install mcpp` (unqualified) still means the
-preprocessor — that name belongs to core and always will.
+installed **and trusted** (see above — under Homebrew 6 the alias resolves
+correctly and is then refused for lack of trust, which reads as the alias being
+broken). Plain `brew install mcpp` (unqualified) still means the preprocessor —
+that name belongs to core and always will.
 
 ## What gets installed, and where
 

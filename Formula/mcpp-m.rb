@@ -84,6 +84,13 @@ class McppM < Formula
 
       The first `mcpp build` downloads a toolchain (LLVM on macOS) and may
       take a while. It is cached in ~/.mcpp and survives `brew upgrade`.
+
+      Homebrew 6 gates third-party taps. You reached this formula through a
+      fully-qualified name, which Homebrew reads as explicit intent — but
+      `brew install mcpp-m`, `brew install mcpp-community/mcpp/mcpp` and
+      `brew upgrade mcpp-m` are refused as "untrusted tap" until you run:
+
+        brew trust mcpp-community/mcpp
     EOS
   end
 
