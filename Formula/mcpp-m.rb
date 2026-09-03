@@ -13,7 +13,7 @@
 class McppM < Formula
   desc "Modern C++23 build and package management tool (module-first)"
   homepage "https://github.com/mcpp-community/mcpp"
-  version "2026.9.3.2"
+  version "2026.9.4.1"
   license "Apache-2.0"
 
   # mcpp keeps its package index in sync over git.
@@ -26,18 +26,18 @@ class McppM < Formula
     depends_on arch: :arm64
     depends_on macos: :sonoma
 
-    url "https://github.com/mcpp-community/mcpp/releases/download/v2026.9.3.2/mcpp-2026.9.3.2-macosx-arm64.tar.gz"
-    sha256 "9969815c45ae7c712cb1cb3307bbe2cef150031d03281372de8fc840c1cdc361"
+    url "https://github.com/mcpp-community/mcpp/releases/download/v2026.9.4.1/mcpp-2026.9.4.1-macosx-arm64.tar.gz"
+    sha256 "ca6c9105f4c2530dc21c7f3d57e21176b8ac3a7ef6107ac07052e8a4d6d77c4f"
   end
 
   on_linux do
     on_intel do
-      url "https://github.com/mcpp-community/mcpp/releases/download/v2026.9.3.2/mcpp-2026.9.3.2-linux-x86_64.tar.gz"
-      sha256 "5c4c514db2dfa0f2ea2ae92f47d20e3568e846c78a8a00ed8d3ec56ad8080d4f"
+      url "https://github.com/mcpp-community/mcpp/releases/download/v2026.9.4.1/mcpp-2026.9.4.1-linux-x86_64.tar.gz"
+      sha256 "0554e3f4039d337c3eb974ac4d957c3660d6edb1b5287faf5af56856f71b0fb7"
     end
     on_arm do
-      url "https://github.com/mcpp-community/mcpp/releases/download/v2026.9.3.2/mcpp-2026.9.3.2-linux-aarch64.tar.gz"
-      sha256 "97cae340690f9146df9e256c877abf7fbb995e148bd2667f99d43a3244b1b463"
+      url "https://github.com/mcpp-community/mcpp/releases/download/v2026.9.4.1/mcpp-2026.9.4.1-linux-aarch64.tar.gz"
+      sha256 "a276465dacbc9a791766c0a6a1b64650704be50d8335c3876e5b07a135e72235"
     end
   end
 
